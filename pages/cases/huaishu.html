@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>槐树村·纸人抬轿 — 暗流</title>
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body class="case-body">
+
+<a class="back-link" href="../../index.html">← 返回档案馆</a>
+
+<div class="case-layout">
+
+  <div class="panel-left">
+    <div id="caseTop"></div>
+    <nav class="case-tabs" id="caseTabs">
+      <button class="case-tab active" data-tab="overview">📋 概述</button>
+      <button class="case-tab" data-tab="reasoning" id="tabReasoning">⚖ 推理</button>
+    </nav>
+    <div id="tabContent"></div>
+  </div>
+
+  <div class="panel-right" id="rightPanel">
+    <div class="clue-header">
+      <h2>📦 已收集线索</h2>
+      <div class="clue-progress-bar"><div class="clue-progress-fill" id="clueProgressFill"></div></div>
+      <div class="clue-progress-text" id="clueProgressText">0 / 0</div>
+    </div>
+    <div class="clue-tag-list" id="clueTagList">
+      <div class="clue-empty">🔍 在左侧输入关键词搜索线索</div>
+    </div>
+    <button class="btn-reasoning-main" id="btnReasoningMain" disabled>⚖ 开始推理</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <div class="ending-type" id="endingType"></div>
+    <h2 id="endingTitle"></h2>
+    <div class="ending-desc" id="endingDesc"></div>
+    <button id="modalClose">知道了</button>
+    <button id="modalBackHome">返回档案馆</button>
+  </div>
+</div>
+
+<script type="module">
+import { renderCase } from '../../js/case-engine.js';
+renderCase('huaishu', { homeUrl: '../../index.html' });
+</script>
+</body>
+</html>
