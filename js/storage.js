@@ -52,6 +52,35 @@ export function saveClueUnlock(caseId, keyword) {
   saveData(d);
 }
 
+/** 密码破译 */
+export function savePasswordSolved(caseId) {
+  const d = loadData();
+  if (!d.cases[caseId]) d.cases[caseId] = { unlocked: [], ending: null };
+  d.cases[caseId].puzzleSolved = true;
+  saveData(d);
+}
+
+export function isPasswordSolved(caseId) {
+  const cp = getCaseProgress(caseId);
+  return !!cp.puzzleSolved;
+}
+
+/** 在线索内部进一步解锁（深层次解锁） */
+export function saveDeepUnlock(caseId, keyword) {
+  const d = loadData();
+  if (!d.cases[caseId]) d.cases[caseId] = { unlocked: [], ending: null };
+  if (!d.cases[caseId].deepUnlocked) d.cases[caseId].deepUnlocked = [];
+  if (!d.cases[caseId].deepUnlocked.includes(keyword)) {
+    d.cases[caseId].deepUnlocked.push(keyword);
+  }
+  saveData(d);
+}
+
+export function isDeepUnlocked(caseId, keyword) {
+  const cp = getCaseProgress(caseId);
+  return (cp.deepUnlocked || []).includes(keyword);
+}
+
 /** 保存案件结局 */
 export function saveCaseEnding(caseId, ending) {
   const d = loadData();
