@@ -3,12 +3,13 @@
 // ===================================================================
 import { $, $$, showToast } from './utils.js';
 import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked } from './storage.js';
-import { caseDB } from './cases/registry.js';
+import { caseDB } from './cases/registry.js?v=20260817';
 
 let _caseId   = null;
 let _homeUrl  = '#';
 let _activeTab = 'overview';
 let _quizIndex = 0;   // 推理问答当前题号（0 起）
+const ENDING_TYPE_TEXT = { normal: '🌑 普通结局', regret: '🌥️ 遗憾结局', true: '🔴 真结局' };
 
 // ========= 弹窗 =========
 (function setupModal() {
@@ -165,12 +166,14 @@ function renderTabContent(c, cp, allKeys, unlocked, allDone, hasEnd) {
     if (hasEnd) {
       const e = c.endings[cp.ending];
       const color = cp.ending === 'true' ? 'var(--red)' : cp.ending === 'regret' ? 'var(--gold)' : '#999';
+      const endingType = ENDING_TYPE_TEXT[e.type] || e.type;
+      const endingDesc = e.desc || e.text || '';
       el.innerHTML = /* html */`
         <div class="reasoning-area">
           <div class="ending-result">
-            <div class="type">${e.type}</div>
+            <div class="type">${endingType}</div>
             <div class="title" style="color:${color}">${e.title}</div>
-            <div class="desc">${e.desc}</div>
+            <div class="desc">${endingDesc}</div>
             <button class="btn-replay" id="btnReplay">重新调查</button>
           </div>
         </div>`;
@@ -459,10 +462,8 @@ function bindReasoningBtn(c) {
       saveCaseEnding(_caseId, btn.dataset.ending);
       showEndingModal(c, btn.dataset.ending);
 
-      // 弹窗关闭后刷新页面
-      const doRefresh = () => { renderCase(_caseId, { homeUrl: _homeUrl }); };
-      $('modalClose').addEventListener('click', doRefresh, { once: true });
-      // 返回档案馆按钮不刷新（直接跳走了）
+      // 弹窗关闭后刷新页面（点「知道了」或点背景均刷新；返回档案馆直接跳走）
+      bindEndingModalRefresh();
     });
   });
 }
@@ -536,8 +537,8 @@ function bindReasoningQuiz(c) {
             // 全部答对 → 定案成功（真结局）
             saveCaseEnding(_caseId, 'true');
             showEndingModal(c, 'true');
-            const doRefresh = () => { renderCase(_caseId, { homeUrl: _homeUrl }); };
-            $('modalClose').addEventListener('click', doRefresh, { once: true });
+            // 弹窗关闭后刷新页面（点「知道了」或点背景均刷新；返回档案馆直接跳走）
+            bindEndingModalRefresh();
           } else {
             renderQuizOnly(c, quiz);
           }
@@ -554,12 +555,21 @@ function bindReasoningQuiz(c) {
 }
 
 // ========= 结局弹窗 =========
+// 弹窗关闭后刷新案件视图（点「知道了」或点背景均刷新；返回档案馆直接跳走）
+function bindEndingModalRefresh() {
+  const doRefresh = () => { renderCase(_caseId, { homeUrl: _homeUrl }); };
+  $('modalClose').addEventListener('click', doRefresh, { once: true });
+  $('modalOverlay').addEventListener('click', e => {
+    if (e.target === $('modalOverlay')) doRefresh();
+  }, { once: true });
+}
+
 function showEndingModal(c, endingKey) {
   const e   = c.endings[endingKey];
   const box = $('#modalBox');
   box.className = 'modal-box ' + endingKey;
-  $('#endingType').textContent  = e.type;
+  $('#endingType').textContent  = ENDING_TYPE_TEXT[e.type] || e.type;
   $('#endingTitle').textContent = e.title;
-  $('#endingDesc').innerHTML    = e.desc;
+  $('#endingDesc').innerHTML    = e.desc || e.text || '';
   $('modalOverlay').classList.add('show');
 }

@@ -52,7 +52,7 @@ em { color:var(--gold); font-style:normal; }
    DASHBOARD — index.html
    ================================================================ */
 .dashboard {
-  min-height:100vh;
+  height:100vh;                /* 固定为视口高度，内容超高时触发内部滚动 */
   display:flex; flex-direction:column; align-items:center;
   padding:40px 32px;
   max-width:1000px; margin:0 auto;
