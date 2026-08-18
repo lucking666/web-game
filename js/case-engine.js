@@ -3,7 +3,7 @@
 // ===================================================================
 import { $, $$, showToast } from './utils.js';
 import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked } from './storage.js';
-import { caseDB } from './cases/registry.js?v=20260817';
+import { caseDB } from './cases/registry.js?v=20260819';
 
 let _caseId   = null;
 let _homeUrl  = '#';
@@ -237,10 +237,10 @@ function bindSearch(c, allKeys) {
     if (!raw) { showToast('请输入关键词'); return; }
 
     const cp = getCaseProgress(_caseId);
-    const remaining = allKeys.filter(k => !cp.unlocked.includes(k));
 
-    // 连续子串匹配：输入词与关键词互为连续子串
-    const found = remaining.find(k =>
+    // 连续子串匹配：输入词与关键词互为连续子串（在全部线索中查找，
+    // 已解锁的关键词也要能命中，避免误报"无匹配"）
+    const found = allKeys.find(k =>
       k.includes(raw) || raw.includes(k)
     );
 
