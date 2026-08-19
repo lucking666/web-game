@@ -6,10 +6,10 @@
 // ===================================================================
 import { CONFIG } from './cloudbase-config.js?v=20260822';
 
-// CloudBase JS SDK（CDN 加载，优先 jsdelivr，失败回退官方静态托管）
+// CloudBase JS SDK（优先本地 vendor 同域加载，失败回退官方静态托管 CDN）
 const SDK_URLS = [
-  'https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2/dist/index.umd.js',
-  'https://static.cloudbase.net/cloudbase-js-sdk/2.7.1/cloudbase.full.js'
+  new URL('./vendor/cloudbase.full.js', import.meta.url).href,
+  'https://static.cloudbase.net/cloudbase-js-sdk/2.32.0/cloudbase.full.js'
 ];
 
 let _app  = null;   // CloudBase 应用实例
@@ -74,25 +74,34 @@ function fmtDate(d) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
-function fetchWithTimeout(url, ms) {
-  return new Promise((resolve, reject) => {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), ms);
-    fetch(url, { signal: ctrl.signal })
-      .then(r => r.json().then(resolve))
-      .catch(reject)
-      .finally(() => clearTimeout(timer));
-  });
-}
+/**
+ * 获取公网 IP。
+ * 用 <script> 标签加载 JSONP 接口（搜狐 cityjson），
+ * script 标签不受 CORS 限制，不会在 Network 面板制造跨域报错。
+ * 全部失败返回 'unknown'。
+ */
+function getPublicIp() {
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = ip => {
+      if (settled) return;
+      settled = true;
+      try { document.head.removeChild(s); } catch (_) {}
+      resolve(ip);
+    };
 
-/** 获取公网 IP（失败返回 unknown） */
-async function getPublicIp() {
-  try {
-    const j = await fetchWithTimeout('https://api.ipify.org?format=json', 3000);
-    return (j && j.ip) ? j.ip : 'unknown';
-  } catch (_) {
-    return 'unknown';
-  }
+    const s = document.createElement('script');
+    s.src = 'https://pv.sohu.com/cityjson?ie=utf-8&t=' + Date.now();
+    s.onload = () => {
+      try {
+        const ip = window.returnCitySN && window.returnCitySN.cip;
+        if (ip && /^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) return done(ip);
+      } catch (_) {}
+      done('unknown');
+    };
+    s.onerror = () => done('unknown');
+    document.head.appendChild(s);
+  });
 }
 
 /** 秒数 → "X分Y秒" */

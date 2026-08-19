@@ -2,10 +2,10 @@
 // 暗流 — 案件引擎（两栏布局：左侧搜索/标签，右侧可滚动线索列）
 // ===================================================================
 import { $, $$, showToast } from './utils.js';
-import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked, getUser } from './storage.js?v=20260822';
+import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked, getUser } from './storage.js?v=20260824';
 import { caseDB } from './cases/registry.js?v=20260821';
-import { submitLeaderboard, getNickname } from './cloudbase.js?v=20260822';
-import { renderComments } from './comments.js?v=20260822';
+import { submitLeaderboard, getNickname } from './cloudbase.js?v=20260824';
+import { renderComments } from './comments.js?v=20260824';
 
 let _caseId   = null;
 let _homeUrl  = '#';
