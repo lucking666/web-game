@@ -3,8 +3,8 @@
 // 展示全站最快 + 各案件 Top，按结案用时升序。
 // ===================================================================
 import { $ } from './utils.js';
-import { caseDB, caseOrder } from './cases/registry.js?v=20260821';
-import { fetchLeaderboard, fmtTime, isConfigured } from './cloudbase.js?v=20260827';
+import { caseDB, caseOrder } from './cases/registry.js?v=20260830';
+import { fetchLeaderboard, fmtTime, isConfigured } from './cloudbase.js?v=20260830';
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({

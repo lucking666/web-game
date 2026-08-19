@@ -2,7 +2,7 @@
 // 暗流 — 本地存储层（含云存档同步）
 // 本地立即读写；云端在未配置环境或网络异常时静默跳过，不影响运行。
 // ===================================================================
-import { pushSave, pullSave } from './cloudbase.js?v=20260827';
+import { pushSave, pullSave } from './cloudbase.js?v=20260830';
 
 const KEY = 'anliu_archive';
 
@@ -116,6 +116,22 @@ export function saveDeepUnlock(caseId, keyword) {
 export function isDeepUnlocked(caseId, keyword) {
   const cp = getCaseProgress(caseId);
   return (cp.deepUnlocked || []).includes(keyword);
+}
+
+/** 拼图线索解锁（完成拼图后才能查看的线索） */
+export function savePuzzleSolved(caseId, keyword) {
+  const d = loadData();
+  if (!d.cases[caseId]) d.cases[caseId] = { unlocked: [], ending: null };
+  if (!d.cases[caseId].puzzleSolved) d.cases[caseId].puzzleSolved = [];
+  if (!d.cases[caseId].puzzleSolved.includes(keyword)) {
+    d.cases[caseId].puzzleSolved.push(keyword);
+  }
+  saveData(d);
+}
+
+export function isPuzzleSolved(caseId, keyword) {
+  const cp = getCaseProgress(caseId);
+  return (cp.puzzleSolved || []).includes(keyword);
 }
 
 /** 保存案件结局 */

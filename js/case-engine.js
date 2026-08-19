@@ -2,10 +2,19 @@
 // 暗流 — 案件引擎（两栏布局：左侧搜索/标签，右侧可滚动线索列）
 // ===================================================================
 import { $, $$, showToast } from './utils.js';
-import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked, getUser } from './storage.js?v=20260827';
-import { caseDB } from './cases/registry.js?v=20260821';
-import { submitLeaderboard, getNickname } from './cloudbase.js?v=20260827';
-import { renderComments } from './comments.js?v=20260827';
+import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked, savePuzzleSolved, isPuzzleSolved, getUser } from './storage.js?v=20260830';
+import { caseDB } from './cases/registry.js?v=20260830';
+import { submitLeaderboard, getNickname } from './cloudbase.js?v=20260830';
+import { renderComments } from './comments.js?v=20260830';
+import { openPuzzleGame } from './games/puzzle.js?v=20260830';
+
+/** 将「相对项目根」的资源路径解析为「相对当前页面」的路径（案件页在 pages/cases/ 下需补前缀） */
+function resolveAsset(src) {
+  if (!src) return src;
+  if (/^([a-z]+:)?\/\//i.test(src) || src.charAt(0) === '/' || src.startsWith('data:')) return src;
+  const inCasePage = location.pathname.includes('/pages/cases/');
+  return (inCasePage ? '../../' : '') + src;
+}
 
 let _caseId   = null;
 let _homeUrl  = '#';
@@ -370,6 +379,21 @@ function renderClueTags(c, allKeys, unlocked) {
             </div>
           </div>`;
       }
+      const puzzleDef = c.puzzleClues && c.puzzleClues[k];
+      const puzzleSolved = puzzleDef ? isPuzzleSolved(_caseId, k) : true;
+      if (puzzleDef && !puzzleSolved) {
+        return /* html */`
+          <div class="clue-tag locked" data-clue-key="${k}">
+            <div class="clue-tag-bar">
+              <span class="clue-tag-icon">🧩</span>
+              <span class="clue-tag-name">${k}<span class="clue-locked-label"> （拼图锁定）</span></span>
+            </div>
+            <div class="clue-tag-body">
+              <div class="locked-preview">${puzzleDef.lockedPreview}</div>
+              <button type="button" class="puzzle-btn" data-puzzle-key="${k}">🧩 完成拼图解锁</button>
+            </div>
+          </div>`;
+      }
       return /* html */`
         <div class="clue-tag" data-clue-key="${k}">
           <div class="clue-tag-bar">
@@ -420,6 +444,27 @@ function renderClueTags(c, allKeys, unlocked) {
         const btn = tag.querySelector('.lock-btn');
         if (btn) btn.click();
       }
+    });
+  });
+
+  // 绑定拼图解锁按钮
+  $$('.puzzle-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const keyword   = btn.dataset.puzzleKey;
+      const puzzleDef = c.puzzleClues && c.puzzleClues[keyword];
+      if (!puzzleDef) return;
+      openPuzzleGame({
+        title: `🧩「${keyword}」拼图解锁`,
+        hint: puzzleDef.hint || '将画面碎片拼回原图，还原线索。',
+        image: resolveAsset(puzzleDef.image),
+        size: puzzleDef.size || 3,
+        onComplete: () => {
+          savePuzzleSolved(_caseId, keyword);
+          showToast(`✅ 拼图完成！「${keyword}」档案已解锁`);
+          refreshRight(c, allKeys);
+        }
+      });
     });
   });
 }

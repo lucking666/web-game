@@ -2,10 +2,10 @@
 // 暗流 — 档案馆首页（Dashboard）
 // ===================================================================
 import { $ } from './utils.js';
-import { getCaseProgress } from './storage.js?v=20260827';
-import { caseDB, caseOrder } from './cases/registry.js?v=20260821';
-import { CONFIG } from './cloudbase-config.js?v=20260827';
-import { reportVisit, fetchStats } from './cloudbase.js?v=20260827';
+import { getCaseProgress } from './storage.js?v=20260830';
+import { caseDB, caseOrder } from './cases/registry.js?v=20260830';
+import { CONFIG } from './cloudbase-config.js?v=20260830';
+import { reportVisit, fetchStats } from './cloudbase.js?v=20260830';
 
 let _stats = null; // 云端访问统计缓存
 
