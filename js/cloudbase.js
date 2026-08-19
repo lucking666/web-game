@@ -4,7 +4,7 @@
 // 所有方法都做了容错：未配置环境 ID 或网络异常时静默降级，
 // 返回 false / null / []，绝不抛错、绝不阻塞游戏运行。
 // ===================================================================
-import { CONFIG } from './cloudbase-config.js?v=20260830';
+import { CONFIG } from './cloudbase-config.js?v=20260901';
 
 // CloudBase JS SDK（优先本地 vendor 同域加载，失败回退官方静态托管 CDN）
 const SDK_URLS = [

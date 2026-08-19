@@ -2,11 +2,11 @@
 // 暗流 — 案件引擎（两栏布局：左侧搜索/标签，右侧可滚动线索列）
 // ===================================================================
 import { $, $$, showToast } from './utils.js';
-import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked, savePuzzleSolved, isPuzzleSolved, getUser } from './storage.js?v=20260830';
-import { caseDB } from './cases/registry.js?v=20260830';
-import { submitLeaderboard, getNickname } from './cloudbase.js?v=20260830';
-import { renderComments } from './comments.js?v=20260830';
-import { openPuzzleGame } from './games/puzzle.js?v=20260830';
+import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked, savePuzzleSolved, isPuzzleSolved, getUser } from './storage.js?v=20260901';
+import { caseDB } from './cases/registry.js?v=20260901';
+import { submitLeaderboard, getNickname } from './cloudbase.js?v=20260901';
+import { renderComments } from './comments.js?v=20260901';
+import { openPuzzleGame } from './games/puzzle.js?v=20260901';
 
 /** 将「相对项目根」的资源路径解析为「相对当前页面」的路径（案件页在 pages/cases/ 下需补前缀） */
 function resolveAsset(src) {
@@ -72,8 +72,8 @@ export function renderCase(caseId, opts = {}) {
   updateProgress(allKeys, unlocked);
   updateReasoningBtn(c, allDone, hasEnd);
 
-  // ⑥ 留言区（页面存在 #comments 容器才渲染）
-  renderComments(caseId);
+  // ⑥ 留言区（页面存在 #comments 容器才渲染；结案后解锁，可看可写）
+  renderComments(caseId, hasEnd);
 }
 
 // ========= 顶部标题 =========

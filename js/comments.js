@@ -3,8 +3,8 @@
 // 页面存在 #comments 容器时自动挂载；未接入云端时显示离线提示。
 // ===================================================================
 import { $, showToast } from './utils.js';
-import { getUser } from './storage.js?v=20260830';
-import { fetchComments, submitComment, getNickname, isConfigured } from './cloudbase.js?v=20260830';
+import { getUser } from './storage.js?v=20260901';
+import { fetchComments, submitComment, getNickname, isConfigured } from './cloudbase.js?v=20260901';
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
@@ -20,9 +20,23 @@ function fmtWhen(iso) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-export async function renderComments(caseId) {
+export async function renderComments(caseId, unlocked = false) {
   const host = $('#comments');
   if (!host) return;
+
+  // 留言解锁门槛：未结案时留言区整体锁定（不看、不写）
+  if (!unlocked) {
+    host.innerHTML = /* html */`
+      <div class="comments">
+        <div class="comments-title">📜 档案留言</div>
+        <div class="comment-locked">
+          <div class="comment-locked-icon">🔒</div>
+          <div class="comment-locked-title">留言区已上锁</div>
+          <div class="comment-locked-desc">完成本案推理、揭示结局后，才能查看档案留言并写下你的感想。</div>
+        </div>
+      </div>`;
+    return;
+  }
 
   host.innerHTML = /* html */`
     <div class="comments">
