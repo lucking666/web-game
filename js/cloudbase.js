@@ -295,7 +295,8 @@ export async function submitComment(caseId, nickname, content) {
       created_at: new Date().toISOString()
     });
     return true;
-  } catch (_) {
+  } catch (err) {
+    console.error('[留言] 写入失败:', err && (err.message || err.code || err));
     return false;
   }
 }

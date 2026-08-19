@@ -2,10 +2,10 @@
 // 暗流 — 档案馆首页（Dashboard）
 // ===================================================================
 import { $ } from './utils.js';
-import { getCaseProgress } from './storage.js?v=20260825';
+import { getCaseProgress } from './storage.js?v=20260827';
 import { caseDB, caseOrder } from './cases/registry.js?v=20260821';
-import { CONFIG } from './cloudbase-config.js?v=20260825';
-import { reportVisit, fetchStats } from './cloudbase.js?v=20260825';
+import { CONFIG } from './cloudbase-config.js?v=20260827';
+import { reportVisit, fetchStats } from './cloudbase.js?v=20260827';
 
 let _stats = null; // 云端访问统计缓存
 
@@ -48,7 +48,7 @@ export function renderDashboard() {
     html += /* html */`
       <div class="case-card" data-case-id="${id}">
         ${badge}
-        <div class="card-icon">${c.icon}</div>
+        <div class="card-icon"><img src="images/covers/${id}.png" alt="${c.title}" loading="lazy"></div>
         <div class="card-tag ${c.tagClass}">${c.tag}</div>
         <div class="card-name">${c.title.replace(/ /g, '')}</div>
         <div class="card-desc">${c.desc}</div>

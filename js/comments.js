@@ -3,8 +3,8 @@
 // 页面存在 #comments 容器时自动挂载；未接入云端时显示离线提示。
 // ===================================================================
 import { $, showToast } from './utils.js';
-import { getUser } from './storage.js?v=20260825';
-import { fetchComments, submitComment, getNickname, isConfigured } from './cloudbase.js?v=20260825';
+import { getUser } from './storage.js?v=20260827';
+import { fetchComments, submitComment, getNickname, isConfigured } from './cloudbase.js?v=20260827';
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({

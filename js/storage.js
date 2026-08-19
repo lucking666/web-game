@@ -2,7 +2,7 @@
 // 暗流 — 本地存储层（含云存档同步）
 // 本地立即读写；云端在未配置环境或网络异常时静默跳过，不影响运行。
 // ===================================================================
-import { pushSave, pullSave } from './cloudbase.js?v=20260825';
+import { pushSave, pullSave } from './cloudbase.js?v=20260827';
 
 const KEY = 'anliu_archive';
 
