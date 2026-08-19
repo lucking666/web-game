@@ -2,8 +2,12 @@
 // 暗流 — 档案馆首页（Dashboard）
 // ===================================================================
 import { $ } from './utils.js';
-import { getCaseProgress } from './storage.js';
+import { getCaseProgress } from './storage.js?v=20260822';
 import { caseDB, caseOrder } from './cases/registry.js?v=20260821';
+import { CONFIG } from './cloudbase-config.js?v=20260822';
+import { reportVisit, fetchStats } from './cloudbase.js?v=20260822';
+
+let _stats = null; // 云端访问统计缓存
 
 export function renderDashboard() {
   let solved = 0, totalClues = 0;
@@ -17,6 +21,10 @@ export function renderDashboard() {
   $('statTotal').textContent = caseOrder.length;
   $('statSolved').textContent = solved;
   $('statClues').textContent  = totalClues;
+
+  // 访问统计（云端）：未配置显示 —，已配置未加载显示 …，加载后显示数值
+  $('statVisits').textContent = _stats ? _stats.visits : (CONFIG.envId ? '…' : '—');
+  $('statToday').textContent  = _stats ? _stats.today  : (CONFIG.envId ? '…' : '—');
 
   let html = '';
   caseOrder.forEach(id => {
@@ -56,4 +64,17 @@ export function renderDashboard() {
       window.location.href = 'pages/cases/' + card.dataset.caseId + '.html';
     });
   });
+}
+
+/** 云端功能初始化：上报访问 + 拉取统计 + 云端存档回填后重渲染 */
+export async function initCloudFeatures() {
+  if (!CONFIG.envId) return;
+  reportVisit('index');
+  const s = await fetchStats();
+  if (s) {
+    _stats = s;
+    renderDashboard();
+  }
+  // 云端存档比本地新时，storage 会广播事件，这里重渲染卡片状态
+  window.addEventListener('cloud-save-loaded', () => renderDashboard());
 }

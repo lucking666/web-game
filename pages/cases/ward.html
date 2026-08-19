@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>静默病房 — 暗流</title>
-<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="../../css/style.css?v=20260822">
 </head>
 <body class="case-body">
 
@@ -33,6 +33,7 @@
       <div class="clue-empty">🔍 在左侧输入关键词搜索线索</div>
     </div>
     <button type="button" class="btn-reasoning-main" id="btnReasoningMain" disabled>⚖ 开始推理</button>
+    <div class="comments-wrap" id="comments"></div>
   </div>
 
 </div>
@@ -50,7 +51,7 @@
 </div>
 
 <script type="module">
-import { renderCase } from '../../js/case-engine.js?v=20260821';
+import { renderCase } from '../../js/case-engine.js?v=20260822';
 renderCase('ward', { homeUrl: '../../index.html' });
 </script>
 </body>

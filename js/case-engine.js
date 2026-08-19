@@ -2,8 +2,10 @@
 // 暗流 — 案件引擎（两栏布局：左侧搜索/标签，右侧可滚动线索列）
 // ===================================================================
 import { $, $$, showToast } from './utils.js';
-import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked } from './storage.js';
+import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked, getUser } from './storage.js?v=20260822';
 import { caseDB } from './cases/registry.js?v=20260821';
+import { submitLeaderboard, getNickname } from './cloudbase.js?v=20260822';
+import { renderComments } from './comments.js?v=20260822';
 
 let _caseId   = null;
 let _homeUrl  = '#';
@@ -34,6 +36,11 @@ export function renderCase(caseId, opts = {}) {
   if (_caseId !== caseId) { _activeTab = 'overview'; }
   _caseId = caseId;
 
+  // 首次进入记录开始时间（用于排行榜结案用时）
+  if (!localStorage.getItem('anliu_started_' + caseId)) {
+    localStorage.setItem('anliu_started_' + caseId, String(Date.now()));
+  }
+
   const cp       = getCaseProgress(caseId);
   const allKeys  = Object.keys(c.clueDB);
   const unlocked = cp.unlocked;
@@ -55,6 +62,9 @@ export function renderCase(caseId, opts = {}) {
   // ⑤ 右侧进度条 + 推理按钮
   updateProgress(allKeys, unlocked);
   updateReasoningBtn(c, allDone, hasEnd);
+
+  // ⑥ 留言区（页面存在 #comments 容器才渲染）
+  renderComments(caseId);
 }
 
 // ========= 顶部标题 =========
@@ -455,11 +465,26 @@ function updateReasoningBtn(c, allDone, hasEnd) {
   }
 }
 
+// ========= 结案上报（排行榜） =========
+function reportFinish(c, endingKey) {
+  const started = parseInt(localStorage.getItem('anliu_started_' + _caseId) || '0', 10);
+  const time_used = started ? Math.max(1, Math.round((Date.now() - started) / 1000)) : 0;
+  submitLeaderboard({
+    case_id: _caseId,
+    case_name: c.title,
+    nickname: getUser() || getNickname(),
+    time_used,
+    ending: endingKey
+  });
+  localStorage.removeItem('anliu_started_' + _caseId);
+}
+
 // ========= 推理选项点击（旧版：一次选择） =========
 function bindReasoningBtn(c) {
   $$('#reasoningChoices .choice-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       saveCaseEnding(_caseId, btn.dataset.ending);
+      reportFinish(c, btn.dataset.ending);
       showEndingModal(c, btn.dataset.ending);
 
       // 弹窗关闭后刷新页面（点「知道了」或点背景均刷新；返回档案馆直接跳走）
@@ -536,6 +561,7 @@ function bindReasoningQuiz(c) {
           if (_quizIndex >= quiz.length) {
             // 全部答对 → 定案成功（真结局）
             saveCaseEnding(_caseId, 'true');
+            reportFinish(c, 'true');
             showEndingModal(c, 'true');
             // 弹窗关闭后刷新页面（点「知道了」或点背景均刷新；返回档案馆直接跳走）
             bindEndingModalRefresh();

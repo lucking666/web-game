@@ -4,7 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>暗流 · 民间悬案推理档案馆</title>
-<link rel="stylesheet" href="css/style.css?v=20260817">
+<script>
+/* 旧地址（GitHub Pages 等）自动导流到 CloudBase 静态托管，云端功能才可用 */
+(function () {
+  var host = location.hostname;
+  var isCloudBase = host.indexOf('tcloudbaseapp.com') !== -1;
+  var isLocal = host === '' || host === 'localhost' || host === '127.0.0.1';
+  if (!isCloudBase && !isLocal) {
+    location.replace('https://anliu-d3glcrqjvd86ed03d-1344506575.tcloudbaseapp.com/');
+  }
+})();
+</script>
+<link rel="stylesheet" href="css/style.css?v=20260822">
 </head>
 <body>
 
@@ -30,14 +41,25 @@
       <div class="num" id="statClues">0</div>
       <div class="label">解锁线索</div>
     </div>
+    <div class="stat-item">
+      <div class="num" id="statVisits">—</div>
+      <div class="label">来访次数</div>
+    </div>
+    <div class="stat-item">
+      <div class="num" id="statToday">—</div>
+      <div class="label">今日来访</div>
+    </div>
   </div>
+
+  <a class="dash-link" href="pages/leaderboard.html">🏆 侦探榜</a>
 
   <div class="case-grid" id="caseGrid"></div>
 </div>
 
 <script type="module">
-import { renderDashboard } from './js/dashboard.js?v=20260821';
+import { renderDashboard, initCloudFeatures } from './js/dashboard.js?v=20260822';
 renderDashboard();
+initCloudFeatures();
 </script>
 
 </body>

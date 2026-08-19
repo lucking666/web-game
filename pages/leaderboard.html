@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>侦探榜 — 暗流</title>
+<link rel="stylesheet" href="../css/style.css?v=20260822">
+</head>
+<body class="lb-body">
+
+<a class="back-link" href="../index.html">← 返回档案馆</a>
+
+<div class="lb-page">
+  <div class="lb-head">
+    <h1>🏆 侦探榜</h1>
+    <p class="lb-sub">按单案结案用时排名，同一案件仅保留个人最佳成绩</p>
+  </div>
+  <div id="leaderboard"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { renderLeaderboard } from '../js/leaderboard.js?v=20260822';
+renderLeaderboard();
+</script>
+
+</body>
+</html>

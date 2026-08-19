@@ -1,22 +1,59 @@
 // ===================================================================
-// 暗流 — 本地存储层
+// 暗流 — 本地存储层（含云存档同步）
+// 本地立即读写；云端在未配置环境或网络异常时静默跳过，不影响运行。
 // ===================================================================
+import { pushSave, pullSave } from './cloudbase.js?v=20260822';
 
 const KEY = 'anliu_archive';
 
-/** 读取全部数据 */
-export function loadData() {
+let _cloudSynced = false; // 本次会话是否已尝试拉取云端存档
+let _pushTimer   = null;  // 云推送防抖定时器
+
+function readLocal() {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : { user: null, cases: {} };
+    return raw ? JSON.parse(raw) : { user: null, cases: {}, _updatedAt: 0 };
   } catch (_) {
-    return { user: null, cases: {} };
+    return { user: null, cases: {}, _updatedAt: 0 };
   }
 }
 
-/** 写入全部数据 */
-export function saveData(data) {
+function writeLocal(data) {
   localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+/** 首次加载后尝试拉取云端存档；云端较新则覆盖本地并广播刷新页面 */
+function syncFromCloud(local) {
+  if (_cloudSynced) return;
+  _cloudSynced = true;
+  pullSave().then(cloud => {
+    if (!cloud || !cloud.cases) return;
+    const localT = local._updatedAt || 0;
+    const cloudT = cloud._updatedAt || 0;
+    if (cloudT > localT) {
+      writeLocal({
+        user: cloud.user !== undefined ? cloud.user : local.user,
+        cases: cloud.cases || {},
+        _updatedAt: cloudT
+      });
+      window.dispatchEvent(new CustomEvent('cloud-save-loaded'));
+    }
+  }).catch(() => {});
+}
+
+/** 读取全部数据（本地优先，随后异步合并云端） */
+export function loadData() {
+  const local = readLocal();
+  syncFromCloud(local);
+  return local;
+}
+
+/** 写入全部数据（本地立即写入，云端防抖推送） */
+export function saveData(data) {
+  const d = { ...data, _updatedAt: Date.now() };
+  writeLocal(d);
+  clearTimeout(_pushTimer);
+  _pushTimer = setTimeout(() => pushSave(d), 800);
 }
 
 /** 当前登录用户 */
