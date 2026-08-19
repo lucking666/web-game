@@ -3,7 +3,7 @@
 // ===================================================================
 import { $, $$, showToast } from './utils.js';
 import { getCaseProgress, saveClueUnlock, saveCaseEnding, resetCase, savePasswordSolved, isPasswordSolved, saveDeepUnlock, isDeepUnlocked } from './storage.js';
-import { caseDB } from './cases/registry.js?v=20260819';
+import { caseDB } from './cases/registry.js?v=20260821';
 
 let _caseId   = null;
 let _homeUrl  = '#';

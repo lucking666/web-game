@@ -3,7 +3,7 @@
 // ===================================================================
 import { $ } from './utils.js';
 import { getCaseProgress } from './storage.js';
-import { caseDB, caseOrder } from './cases/registry.js?v=20260819';
+import { caseDB, caseOrder } from './cases/registry.js?v=20260821';
 
 export function renderDashboard() {
   let solved = 0, totalClues = 0;
