@@ -5,17 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>暗流 · 民间悬案推理档案馆</title>
 <script>
-/* 旧地址（GitHub Pages 等）自动导流到 CloudBase 静态托管，云端功能才可用 */
+/* 旧地址（GitHub Pages 等）自动导流到 CloudBase 静态托管。
+ * 顺带做「进度搬家」：跳转前把旧域名 localStorage 里的存档塞进 URL hash，
+ * CloudBase 端收到后写回本地存储，一次打开即可完成迁移，无需手动复制。 */
 (function () {
   var host = location.hostname;
   var isCloudBase = host.indexOf('tcloudbaseapp.com') !== -1;
   var isLocal = host === '' || host === 'localhost' || host === '127.0.0.1';
-  if (!isCloudBase && !isLocal) {
-    location.replace('https://anliu-d3glcrqjvd86ed03d-1344506575.tcloudbaseapp.com/');
+  var CLOUD = 'https://anliu-d3glcrqjvd86ed03d-1344506575.tcloudbaseapp.com/';
+
+  /* —— CloudBase 端：接收迁移数据并写回本地存储 —— */
+  if (isCloudBase) {
+    try {
+      var h = location.hash;
+      if (h && h.indexOf('migrate=') === 1) {
+        localStorage.setItem('anliu_archive', decodeURIComponent(h.slice(9)));
+        history.replaceState(null, '', location.pathname); // 清除 hash，避免刷新重复写入
+        location.reload(); // 重载后按新进度渲染
+      }
+    } catch (e) {}
+    return;
+  }
+
+  /* —— 旧地址（GitHub Pages 等）：带走本地进度，再自动跳转 —— */
+  if (!isLocal) {
+    try {
+      var raw = localStorage.getItem('anliu_archive');
+      if (raw) {
+        var d = JSON.parse(raw);
+        // 只在确有案件进度时迁移，空存档不折腾
+        if (d && d.cases && Object.keys(d.cases).length > 0) {
+          location.replace(CLOUD + '#migrate=' + encodeURIComponent(raw));
+          return;
+        }
+      }
+    } catch (e) {}
+    location.replace(CLOUD);
   }
 })();
 </script>
-<link rel="stylesheet" href="css/style.css?v=20260824">
+<link rel="stylesheet" href="css/style.css?v=20260825">
 </head>
 <body>
 
@@ -57,7 +86,7 @@
 </div>
 
 <script type="module">
-import { renderDashboard, initCloudFeatures } from './js/dashboard.js?v=20260824';
+import { renderDashboard, initCloudFeatures } from './js/dashboard.js?v=20260825';
 renderDashboard();
 initCloudFeatures();
 </script>

@@ -147,8 +147,11 @@ export async function reportVisit(page) {
     const ip   = await getPublicIp();
     const col  = _db.collection(CONFIG.cols.stats);
     const docRef = col.doc('global');
+    // 注意：CloudBase 对不存在的 doc 执行 get() 返回 { data: [] }（空数组），
+    // 不能用 cur.data 判断存在性，必须看数组长度。
     const cur = await docRef.get().catch(() => null);
-    const data = cur && cur.data ? cur.data : null;
+    const docs = cur && Array.isArray(cur.data) ? cur.data : [];
+    const data = docs.length ? docs[0] : null;
 
     if (!data) {
       await docRef.set({ visits: 1, today: 1, lastDate: today, lastIp: ip, lastVisit: iso });
@@ -169,12 +172,13 @@ export async function reportVisit(page) {
   } catch (_) { /* 静默降级 */ }
 }
 
-/** 读取全局访问统计（未接入返回 null） */
+/** 读取全局访问统计（未接入或尚无数据返回 null） */
 export async function fetchStats() {
   if (!(await ensureReady())) return null;
   try {
     const res = await _db.collection(CONFIG.cols.stats).doc('global').get();
-    return res && res.data ? res.data : null;
+    const docs = res && Array.isArray(res.data) ? res.data : [];
+    return docs.length ? docs[0] : null;
   } catch (_) {
     return null;
   }

@@ -4,7 +4,7 @@
 // ===================================================================
 import { $ } from './utils.js';
 import { caseDB, caseOrder } from './cases/registry.js?v=20260821';
-import { fetchLeaderboard, fmtTime, isConfigured } from './cloudbase.js?v=20260824';
+import { fetchLeaderboard, fmtTime, isConfigured } from './cloudbase.js?v=20260825';
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
